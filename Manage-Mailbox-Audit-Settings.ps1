@@ -10,6 +10,9 @@
         -Used as a small tool to get an overview of Exchange Audit.
         -And can be used to Manage Exchange Mailbox Audit and setting a maximum audit level on all mailboxes.
 
+	REFERENCE:
+	- Exchange 2016 Audit Settings: https://technet.microsoft.com/en-us/library/ff459237.aspx#mailbox
+	
 	.CHANGE LOG
 		v1.0 22nd Mar 2018	Initial version (PSC)
         v1.1 14th Apr 2018	Updated with more features (PSC)
