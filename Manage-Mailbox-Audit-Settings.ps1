@@ -1,18 +1,18 @@
 <#	
 	.NOTES
 	===========================================================================
-	Title:		      Manage-Mailbox-Audit-Settings
+	Title:		    Manage-Mailbox-Audit-Settings
 	Created by:   	Peter Schmidt (peter@msdigest.net) 
-  Blog:           www.msdigest.net
+    Blog:           www.msdigest.net
 	Organization: 	Globeteam
 	===========================================================================
 	.DESCRIPTION
-        - A small tool to get an overview of Exchange Audit.
-        - And can be used to Manage Exchange Mailbox Audit and setting a maximum audit level on all mailboxes.
+        -Used as a small tool to get an overview of Exchange Audit.
+        -And can be used to Manage Exchange Mailbox Audit and setting a maximum audit level on all mailboxes.
 
 	.CHANGE LOG
 		v1.0 22nd Mar 2018	Initial version (PSC)
-    v1.1 14th Apr 2018	Updated with minor tweaks (PSC)
+        v1.1 14th Apr 2018	Updated with more features (PSC)
 #>
 
 #Set a dynamic script location based on where script is executed from
@@ -56,7 +56,8 @@ function menu
     	
     Write-Host ""
     Write-Host " Enable Audit"
-    Write-Host "  4.  Enable Audit for All Mailboxes"
+    Write-Host "  4.  Enable Audit for All Mailboxes (Only new Mailboxes, that has Not Audit already Enabled)"
+    Write-Host "  5.  Enable Audit for All Mailboxes (Run through All Mailboxes)
     Write-Host ""
 
        
@@ -117,6 +118,31 @@ function menu
 
         #Get all Mailboxes that has Not been Enabled for Audit
         $MBX=Get-mailbox -ResultSize unlimited | where {$_.AuditEnabled -ne $True}
+        
+        Write-Host ""
+        Write-Host "This will take some time, please be patience..."
+        
+        #Setting the Audit Level for the Mailboxes
+        $MBX | Set-Mailbox -AuditAdmin $AuditAdmin -AuditDelegate $AuditDelegate -AuditOwner $AuditOwner -AuditEnabled:$true -AuditLogAgeLimit $AuditDays
+        
+        Write-Host "All Mailboxes has now been set to Audit Enabled."
+        Write-Host -NoNewLine 'Press any key to continue...';
+		$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+		MENU
+    }
+
+    If ($answer -eq 5)
+    {
+        #Setting Exchange Audit to Maximum Level
+        $AuditAdmin="Create,FolderBind,MessageBind,SendAs,SendOnBehalf,SoftDelete,HardDelete,Update,Move,Copy,MoveToDeletedItems"
+        $AuditDelegate="Create,FolderBind,SendAs,SendOnBehalf,SoftDelete,HardDelete,Update,Move,MoveToDeletedItems"
+        $AuditOwner="Create,SoftDelete,HardDelete,Update,Move,MoveToDeletedItems,MailboxLogin"
+
+        #Set Audit Logging Days
+        $AuditDays=90
+
+        #Get all Mailboxes 
+        $MBX=Get-mailbox -ResultSize unlimited
         
         Write-Host ""
         Write-Host "This will take some time, please be patience..."
